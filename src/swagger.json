@@ -1,0 +1,248 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Atlas",
+        "description": "Essa é uma documentação sobre o AtlasAPI",
+        "version": "1.0.0",
+        "contact": {
+            "email": "paulocezarmotta@gmail.com"
+        }
+    },
+    "tags": [
+        {
+            "name": "users",
+            "description": "Gerenciamento de Usuários"
+        }
+    ],
+    "paths": {
+        "/users": {
+            "post": {
+                "tags": ["users"],
+                "summary": "Criar um novo usuário",
+                "description": "Criar um novo usuário",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    }
+                                },
+                                "example": {
+                                    "name": "Rocketseat",
+                                    "email": "oi@rocketseat.com.br"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Operação realizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Email já está sendo utilizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "example": {
+                                        "error": "This email is already in use"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": ["users"],
+                "summary": "Retorna todos os usuários",
+                "description": "Somente usuário admin pode acessar",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "user_id",
+                        "description": "ID do usuário",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operação realizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/user"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Usuário sem permissão ou não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "example": {
+                                        "error": "You need to be an administrator to list all users"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{user_id}": {
+            "get": {
+                "tags": ["users"],
+                "summary": "Retorna um usuário específico",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/userIdPath"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operação realizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404UserNotFound"
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/admin": {
+            "patch": {
+                "tags": ["users"],
+                "summary": "Torna admin um usuário",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/userIdPath"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Operação realizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404UserNotFound"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "user": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "admin": {
+                        "type": "boolean",
+                        "enum": ["true", "false"]
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "id": "a32d8169-56ef-4d48-a2c1-a595ff748116",
+                    "name": "Rockeseat",
+                    "email": "oi@rockeseat.com.br",
+                    "admin": false,
+                    "created_at": "2021-03-10T22:10:32.992Z",
+                    "updated_at": "2021-03-11T22:10:32.992Z"
+                }
+            }
+        },
+        "parameters": {
+            "userIdPath": {
+                "in": "path",
+                "name": "user_id",
+                "required": true,
+                "description": "ID do usuário",
+                "schema": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            }
+        },
+        "responses": {
+            "404UserNotFound": {
+                "description": "Usuário não encontrado",
+                "type": "object",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            },
+                            "example": {
+                                "error": "User not found"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
